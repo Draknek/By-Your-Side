@@ -10,6 +10,7 @@ package
 		public var spoken:Boolean = false;
 		
 		public var text:Text;
+		public var tween:Tween;
 		
 		public function Trigger (_x:Number = 0, _y:Number = 0)
 		{
@@ -42,10 +43,17 @@ package
 		{
 			var player:Player = world.classFirst(Player) as Player;
 			
+			function resume ():void
+			{
+				text.visible = false;
+				tween.cancel();
+				player.active = true;
+				text = null;
+			}
+			
 			if (text) {
 				if (Input.pressed(Key.SPACE)) {
-					text.visible = false;
-					player.active = true;
+					resume();
 				}
 				return;
 			}
@@ -55,11 +63,21 @@ package
 				
 				player.active = false;
 				
-				text = new Text("...", FP.width*0.5, FP.height*0.5, {size: 32, color: 0xe6e4d5});
+				text = new Text(".", FP.width*0.5, FP.height*0.5, {size: 32, color: 0xe6e4d5});
 				
 				text.centerOO();
 				
 				world.addGraphic(text, -10);
+				
+				FP.alarm(5, function ():void {
+					text.text = "..";
+				});
+				
+				FP.alarm(10, function ():void {
+					text.text = "...";
+				});
+				
+				tween = FP.alarm(30, resume);
 			}
 		}
 	}
